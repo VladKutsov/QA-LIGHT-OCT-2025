@@ -27,7 +27,8 @@ import java.sql.SQLException;
         plugin = {
                 "pretty",
                 "html:target/report.html",
-                "json:target/Cucumber.json"
+                "json:target/Cucumber.json",
+                "io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm"
         }
 )
 public class CucumberRunner extends AbstractTestNGCucumberTests {
@@ -37,14 +38,14 @@ public class CucumberRunner extends AbstractTestNGCucumberTests {
     @BeforeSuite
     public void beforeSuite() throws SQLException, MalformedURLException {
         driver = new RemoteWebDriver(
-                new URL("http://selenium-hub:4444/"),
+                new URL("http://localhost:4444/"),
                 new ChromeOptions());
         WebSteps.driver = driver;
         WebSteps.generalPageObject = new GeneralPageObject(driver);
         WebSteps.cloudFlarePage = new CloudFlarePage(driver);
 
         conn = DriverManager.getConnection(
-                "jdbc:mysql://mysql-db-1:3306/db", "user", "password");
+                "jdbc:mysql://localhost:3306/db", "user", "password");
         DBSteps.conn = conn;
         DBStepsV2.conn = conn;
     }
