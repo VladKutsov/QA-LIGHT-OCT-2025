@@ -1,12 +1,23 @@
 pipeline {
     agent any
 
+    tools {
+        // Uses Jenkins-managed tools
+        maven 'maven3911'
+        // Git install usually named 'Default' or 'git'; safest to just declare Git
+        git 'Default'
+    }
+
     parameters {
         choice(
             name: 'ENV_TYPE',
             choices: ['JENKINS_CHROME', 'JENKINS_FIREFOX'],
             description: 'Choose browser environment'
         )
+    }
+
+    environment {
+        ALLURE_HOME = tool('allure2531')   // Jenkins Allure installation
     }
 
     stages {
@@ -19,10 +30,13 @@ pipeline {
         }
 
         stage('Maven Build') {
-            steps {
-                sh "mvn clean install -Denv.type=${ENV_TYPE}"
-            }
-        }
+                    steps {
+                        // Capture failure but continue pipeline
+                        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                            sh "mvn clean install -Denv.type=${params.ENV_TYPE}"
+                        }
+                    }
+                }
 
         stage('Cucumber Report') {
             steps {
@@ -34,10 +48,11 @@ pipeline {
             steps {
                 allure includeProperties: false,
                        jdk: '',
-                       results: [[path: 'allure-results']]
+                       results: [[path: 'allure-results']],
+                       // explicitly use the configured allure tool
+                       commandline: "${env.ALLURE_HOME}/bin/allure"
             }
         }
-
     }
 
     post {
