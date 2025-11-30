@@ -1,31 +1,41 @@
-package org.qa.light.session15;
+package org.qa.light.session16;
 
 import io.cucumber.testng.AbstractTestNGCucumberTests;
 import io.cucumber.testng.CucumberOptions;
 import org.openqa.selenium.WebDriver;
-import org.qa.light.session14.steps.DBSteps;
-import org.qa.light.session14.steps.DBStepsV2;
-import org.qa.light.session14.steps.WebSteps;
-import org.qa.light.session14.steps.elements.GeneralPageObject;
+import org.qa.light.session15.DBConnectionFactory;
+import org.qa.light.session15.WebDriverFactory;
+import org.qa.light.session16.listener.MyListener;
+import org.qa.light.session16.steps.DBSteps;
+import org.qa.light.session16.steps.DBStepsV2;
+import org.qa.light.session16.steps.WebSteps;
+import org.qa.light.session16.steps.elements.GeneralPageObject;
 import org.qa.light.session8.CloudFlarePage;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Listeners;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
-//TODO: homework for session 11 in cucumber
+//TODO: Write cucumber scenario, which will search for random device from DB
+//TODO: Search for that random device
+//TODO: If device price did not change - test passes
+//TODO: If device pice HAS changed - test fails, and update price in DB
 
 @CucumberOptions(
-        glue = "org.qa.light.session14.steps",
+        tags = "@wip",
+        glue = "org.qa.light.session16.steps",
         features = "src/test/resources/features/demo",
         plugin = {
                 "pretty",
                 "html:target/report.html",
                 "json:target/Cucumber.json",
                 "io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm"
+//                , "org.qa.light.session16.CucumberHooks"
         }
 )
+@Listeners(MyListener.class)
 public class CucumberRunner extends AbstractTestNGCucumberTests {
     private final static WebDriverFactory driverFactory = new WebDriverFactory();
     private final static DBConnectionFactory connectionFactory = new DBConnectionFactory();
@@ -36,7 +46,6 @@ public class CucumberRunner extends AbstractTestNGCucumberTests {
     @BeforeSuite
     public void beforeSuite() {
         driver = driverFactory.getDriver();
-        WebSteps.driver = driver;
         WebSteps.generalPageObject = new GeneralPageObject(driver);
         WebSteps.cloudFlarePage = new CloudFlarePage(driver);
 

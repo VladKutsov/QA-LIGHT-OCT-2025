@@ -10,25 +10,35 @@ import java.net.URL;
 
 public class WebDriverFactory {
 
+    private static WebDriver activeDriver;
+
     @SneakyThrows
-    public WebDriver getDriver() {
+    public static WebDriver getDriver() {
+        if (activeDriver != null) {
+            return activeDriver;
+        }
+
         EnvType envType = EnvType.valueOf(
                 System.getProperty("env.type", "LOCAL_DEFAULT"));
 
         switch (envType) {
             case LOCAL_DEFAULT:
-                return new ChromeDriver();
+                activeDriver = new ChromeDriver();
+                break;
             case REMOTE_DEFAULT:
-                return new RemoteWebDriver(
+                activeDriver = new RemoteWebDriver(
                         new URL("http://localhost:4444/"),
                         new ChromeOptions());
+                break;
             case JENKINS_CHROME:
-                return new RemoteWebDriver(
+                activeDriver = new RemoteWebDriver(
                         new URL("http://selenium-hub:4444/"),
                         new ChromeOptions());
+                break;
             default:
                 System.err.println("NOT IMPLEMENTED YET, FALLBACK TO LOCAL_CHROME");
-                return new ChromeDriver();
+                activeDriver = new ChromeDriver();
         }
+        return activeDriver;
     }
 }
